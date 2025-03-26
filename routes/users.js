@@ -98,4 +98,84 @@ router.post('/login', async (req, res) => {
   }
 });
 
+
+// @route   GET /api/users
+// @desc    Get all users
+
+router.get('/getUser', async (req, res) => {
+  try {
+    const users = await User.find();
+    res.json(users);
+  } catch (error) {
+    console.error('Get users error:', error.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+}
+)
+
+// @route   GET /api/users/:id
+
+router.get('/getUser/:id', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    res.json(user);
+  } catch (error) {
+    console.error('Get user error:', error.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+}
+)
+
+// @route   PUT /api/users/:id
+// @desc    Update user details
+// @access  Private
+router.put('/updateUser/:id', async (req, res) => {
+  const { name, email, phone, address, nic } = req.body;
+
+  try {
+    
+    let user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+   
+    user.name = name || user.name;
+    user.email = email || user.email;
+    user.phone = phone || user.phone;
+    user.address = address || user.address;
+    user.nic = nic || user.nic;
+
+   
+    await user.save();
+
+    res.json({ message: 'User details updated successfully', user });
+  } catch (error) {
+    console.error('Update user error:', error.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+// @route   DELETE /api/users/:id
+// @desc    Delete user
+
+
+router.delete('/deleteUser/:id', async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({ message: 'User deleted successfully' });
+  } catch (error) {
+    console.error('Delete user error:', error.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+
 export default router;
